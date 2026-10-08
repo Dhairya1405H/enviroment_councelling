@@ -1,0 +1,135 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model School {
+  id        String   @id @default(cuid())
+  name      String
+  classes   Class[]
+  targets   Target[]
+  createdAt DateTime @default(now())
+}
+
+model Class {
+  id        String   @id @default(cuid())
+  name      String
+  grade     String
+  schoolId  String
+  school    School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  teacherId String?
+  students  User[]   @relation("ClassStudents")
+  quests    Quest[]
+  createdAt DateTime @default(now())
+}
+
+model User {
+  id             String       @id @default(cuid())
+  email          String       @unique
+  password       String       @default("password123")
+  name           String
+  role           String       // "STUDENT" | "TEACHER" | "ADMIN"
+  avatar         String?
+  classId        String?
+  class          Class?       @relation("ClassStudents", fields: [classId], references: [id])
+  streak         Int          @default(0)
+  lastActiveDate DateTime?
+  totalXp        Int          @default(0)
+  submissions    Submission[] @relation("StudentSubmissions")
+  userBadges     UserBadge[]
+  xpLedger       XpLedger[]
+  createdQuests  Quest[]      @relation("TeacherCreatedQuests")
+  createdAt      DateTime     @default(now())
+}
+
+model Quest {
+  id           String       @id @default(cuid())
+  title        String
+  description  String
+  category     String       // "WASTE" | "WATER" | "ENERGY" | "PLASTIC_FREE" | "PLANTS" | "TRANSPORT"
+  icon         String       @default("Leaf")
+  xpReward     Int          @default(50)
+  impactType   String       // "waste_kg" | "water_l" | "energy_kwh" | "plastic_items" | "saplings" | "co2_kg"
+  impactAmount Float        @default(1.0)
+  impactUnit   String       @default("kg")
+  isHighValue  Boolean      @default(false)
+  dailyLimit   Int          @default(1)
+  classId      String?
+  class        Class?       @relation(fields: [classId], references: [id], onDelete: SetNull)
+  createdById  String?
+  createdBy    User?        @relation("TeacherCreatedQuests", fields: [createdById], references: [id])
+  submissions  Submission[]
+  createdAt    DateTime     @default(now())
+}
+
+model Submission {
+  id             String    @id @default(cuid())
+  studentId      String
+  student        User      @relation("StudentSubmissions", fields: [studentId], references: [id], onDelete: Cascade)
+  questId        String
+  quest          Quest     @relation(fields: [questId], references: [id], onDelete: Cascade)
+  status         String    @default("PENDING") // "PENDING" | "APPROVED" | "REJECTED"
+  proofType      String    @default("PHOTO")   // "PHOTO" | "LOG"
+  photoUrl       String?
+  photoHash      String?
+  logText        String?
+  aiVerdict      String?   // "PASS" | "REVIEW" | "FAIL"
+  aiConfidence   Float?
+  aiReason       String?
+  teacherComment String?
+  reviewedById   String?
+  reviewedAt     DateTime?
+  xpLedger       XpLedger?
+  createdAt      DateTime  @default(now())
+}
+
+model XpLedger {
+  id           String      @id @default(cuid())
+  studentId    String
+  student      User        @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  amount       Int
+  reason       String
+  submissionId String?     @unique
+  submission   Submission? @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  createdAt    DateTime    @default(now())
+}
+
+model Badge {
+  id          String      @id @default(cuid())
+  code        String      @unique
+  name        String
+  description String
+  icon        String
+  category    String
+  criteria    String
+  userBadges  UserBadge[]
+  createdAt   DateTime    @default(now())
+}
+
+model UserBadge {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badgeId    String
+  badge      Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  unlockedAt DateTime @default(now())
+
+  @@unique([userId, badgeId])
+}
+
+model Target {
+  id           String    @id @default(cuid())
+  schoolId     String
+  school       School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  title        String
+  category     String
+  targetValue  Float
+  currentValue Float     @default(0.0)
+  unit         String
+  deadline     DateTime?
+  createdAt    DateTime  @default(now())
+}

@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+:root {
+  --font-heading: var(--font-fredoka), system-ui, sans-serif;
+  --font-body: var(--font-atkinson), system-ui, sans-serif;
+
+  /* Nature-inspired palette */
+  --bg-sky: #f0f9ff;
+  --bg-card: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --border-color: #e2e8f0;
+  
+  --forest-green: #15803d;
+  --forest-dark: #14532d;
+  --forest-light: #dcfce7;
+
+  --sky-blue: #0284c7;
+  --sky-dark: #0369a1;
+  --sky-light: #e0f2fe;
+
+  --sunny-yellow: #eab308;
+  --sunny-amber: #d97706;
+  --sunny-light: #fef9c3;
+}
+
+.dark {
+  --bg-sky: #0b1320;
+  --bg-card: #131e31;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-color: #1e293b;
+
+  --forest-green: #22c55e;
+  --forest-dark: #15803d;
+  --forest-light: #064e3b;
+
+  --sky-blue: #38bdf8;
+  --sky-dark: #0284c7;
+  --sky-light: #082f49;
+
+  --sunny-yellow: #facc15;
+  --sunny-amber: #f59e0b;
+  --sunny-light: #451a03;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-sky);
+  color: var(--text-main);
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+h1, h2, h3, h4, h5, h6, .font-heading {
+  font-family: var(--font-heading);
+  letter-spacing: -0.01em;
+}
+
+/* Accessible tap targets & focus rings */
+button, a, input, select, textarea {
+  touch-action: manipulation;
+}
+
+:focus-visible {
+  outline: 3px solid #0284c7;
+  outline-offset: 2px;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Subtle gentle bounce for quest actions */
+@keyframes bounce-gentle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.animate-gentle {
+  animation: bounce-gentle 2s infinite ease-in-out;
+}
+
+/* Glassmorphism card helpers */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.dark .glass-panel {
+  background: rgba(19, 30, 49, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(30, 41, 59, 0.8);
+}
